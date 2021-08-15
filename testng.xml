@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Grofers API Test">
+    <test name="All the users of City `Grofers` should have more than half of their todos task completed.">
+        <classes>
+            <class name="com.grofers.api.automation.tests.UsersITTest"/>
+        </classes>
+    </test>
+</suite>
