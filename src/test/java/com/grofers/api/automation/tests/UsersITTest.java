@@ -4,12 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.grofers.api.automation.base.BaseTest;
+import com.grofers.api.automation.constant.CityGeoLocationConstants;
+import com.grofers.api.automation.service.client.ToDo;
+import com.grofers.api.automation.service.client.Users;
 import com.jayway.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
-import static com.jayway.restassured.RestAssured.given;
 
 /***
  * @author Sonal Singh Chauhan
@@ -22,41 +24,21 @@ public class UsersITTest extends BaseTest {
     }
     @Test
     public void UserTaskCompletionTest(){
-        Response userResponse = given().header("Content-Type","application/json").when().log().all().get("/users")
-                            .then().extract().response();
+        Response userResponse = Users.GetAllUsers();
         JsonElement userRootNode = new JsonParser().parse(userResponse.body().asString());
         JsonArray users = userRootNode.getAsJsonArray();
         for(int i=0; i<users.size(); i++){
-            if(IsBelongToGrofersCity(users.get(i).getAsJsonObject().get("address"))) {
-                Response todoResponse = given().queryParam("userId", users.get(i).getAsJsonObject().get("id"))
-                        .when().log().all().get("/todos")
-                        .then().extract().response();
+            if(CityGeoLocationConstants.GROFERS_CITY_LOCATION.IsBelongsToThisCity(
+                    users.get(i).getAsJsonObject().get("address").getAsJsonObject().get("geo").getAsJsonObject().get("lat").getAsDouble()
+                    ,users.get(i).getAsJsonObject().get("address").getAsJsonObject().get("geo").getAsJsonObject().get("lng").getAsDouble())
+            ){
+                Response todoResponse = ToDo.GetToDoOfUser(users.get(i).getAsJsonObject().get("id").getAsLong());
                 JsonElement todoRootNode = new JsonParser().parse(todoResponse.body().asString());
                 if(todoRootNode.getAsJsonArray().size()>0)
-                    Assert.assertTrue(TodoCompletionRate(todoRootNode.getAsJsonArray()) > 50f);
+                    Assert.assertTrue(ToDo.TodoCompletionRate(todoRootNode.getAsJsonArray()) > 50f);
             }
         }
     }
-    public float TodoCompletionRate(JsonArray todo){
-        if(todo.size()==0)
-            return 100f;
-        int todoCompleted = 0;
-        for(int j=0; j<todo.size(); j++){
-            if(todo.get(j).getAsJsonObject().get("completed").getAsBoolean())
-                todoCompleted++;
-        }
-        return (todoCompleted*100)/todo.size();
-    }
-    public boolean IsBelongToGrofersCity(JsonElement geoLocation){
-        double lat = geoLocation.getAsJsonObject().get("geo").getAsJsonObject().get("lat").getAsDouble();
-        double lng = geoLocation.getAsJsonObject().get("geo").getAsJsonObject().get("lng").getAsDouble();
-        boolean isBelongToGrofersCity = false;
-        if(lat > -40f && lat < 5f)
-            if(lng > 5f && lng < 100f)
-                isBelongToGrofersCity = true;
-        return isBelongToGrofersCity;
-    }
     @AfterTest
     public void AfterTest(){}
-
 }
