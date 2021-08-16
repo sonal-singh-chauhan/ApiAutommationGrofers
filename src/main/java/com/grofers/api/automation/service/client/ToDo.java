@@ -16,11 +16,11 @@ public class ToDo {
     public static float TodoCompletionRate(JsonArray todo){
         if(todo.size()==0)
             return 100f;
-        int todoCompleted = 0;
+        float todoCompleted = 0f;
         for(int j=0; j<todo.size(); j++){
             if(todo.get(j).getAsJsonObject().get("completed").getAsBoolean())
                 todoCompleted++;
         }
-        return (todoCompleted*100)/todo.size();
+        return (todoCompleted*100f)/(float)todo.size();
     }
 }

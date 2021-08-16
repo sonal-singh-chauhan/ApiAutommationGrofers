@@ -7,6 +7,9 @@ public class BaseTest {
     public void InItBaseTest(){
         RestAssured.baseURI = "https://jsonplaceholder.typicode.com/";
     }
+    public void InItBaseTest(String baseURI){
+        RestAssured.baseURI = baseURI;
+    }
     public void flushTest(){
         RestAssured.reset();
     }

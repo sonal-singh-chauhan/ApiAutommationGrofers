@@ -26,7 +26,7 @@ public class UsersITTest extends BaseTest {
     }
     @Test
     public void UserTaskCompletionTest(){
-        logger.info("Starting test for all users of grofers city should have more thann 50% of their assigned task completed");
+        logger.info("Starting test for all users of grofers city should have more than 50% of their assigned task completed");
         logger.info("Getting all users list");
         Response userResponse = Users.GetAllUsers();
         Assert.assertEquals(userResponse.getStatusCode(),200,"Other than 200 status code found while calling users api");
